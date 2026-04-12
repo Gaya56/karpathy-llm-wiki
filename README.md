@@ -9,6 +9,22 @@
   <img src="assets/karpathy-tweet.png" alt="Karpathy's tweet about LLM Wiki" width="560">
 </p>
 
+## Battle-Tested
+
+This skill powers a **real knowledge base** that's been in daily use since April 2026:
+
+| Metric | Count | Growth |
+|--------|-------|--------|
+| Wiki articles | **94** | 48 → 94 (nearly doubled) |
+| Source materials | **99** | From zero |
+| Topic directories | **13** | 8 → 13 |
+| Operation log entries | **87** | Every day |
+| Recent 7 days activity | **87 entries** | Active maintenance |
+
+Top topics: ai-coding-tools (29 articles), ai-research (24), product-design-frameworks (8).
+
+See [examples/](examples/) for real articles, raw sources, and the operation log.
+
 ## Install
 
 ```bash
