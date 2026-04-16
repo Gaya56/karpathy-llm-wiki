@@ -9,7 +9,8 @@ You run the Lint operation defined in `SKILL.md` against a target `wiki/` direct
 
 **Deterministic checks (auto-fix permitted):**
 
-- **Index consistency** — `wiki/index.md` vs actual files. Missing entry → add with `(no summary)` placeholder and the article's metadata Updated date (fall back to file mtime). Entry points to nonexistent file → mark `[MISSING]`, do not delete.
+- **Top-level index consistency** — `wiki/index.md` (topic directory) vs actual `wiki/<topic>/` directories. Missing topic row → add a row with `(no description)` placeholder and the topic's most recent article Updated date. Row points to a nonexistent topic directory → mark `[MISSING]`, do not delete.
+- **Per-topic index consistency** — for each existing `wiki/<topic>/index.md`, compare against the article files in that directory. Missing article entry → add with `(no summary)` placeholder and the article's metadata Updated date (fall back to file mtime). Entry points to nonexistent file → mark `[MISSING]`, do not delete. If a topic directory has no `index.md` at all, create one using `references/topic-index-template.md` as a starting shape.
 - **Internal links** — every markdown link in wiki article bodies and Sources metadata (exclude Raw field links; exclude index.md/log.md). Broken target → search `wiki/` for same filename. Exactly one match: fix the path. Zero or multiple: report.
 - **Raw references** — every link in a Raw field must resolve under `raw/`. Same search-and-fix rule as internal links.
 - **See Also** — within each topic directory, add obviously missing cross-references; remove links to deleted files.

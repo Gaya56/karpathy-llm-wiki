@@ -88,8 +88,9 @@ your-project/
 │       └── 2026-04-03-source-article.md
 ├── wiki/           ← Compiled knowledge pages maintained by the LLM
 │   ├── topic/
+│   │   ├── index.md        ← Topic's table of contents
 │   │   └── concept-name.md
-│   ├── index.md    ← Global table of contents
+│   ├── index.md    ← Top-level topic directory
 │   └── log.md      ← Append-only operation log
 ```
 

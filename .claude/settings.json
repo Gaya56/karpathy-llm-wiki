@@ -22,7 +22,8 @@
       "Bash(npx add-skill:*)",
       "Bash(mkdir:*)",
       "Bash(touch:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "WebFetch"
     ],
     "ask": [
       "Bash(git push:*)",
