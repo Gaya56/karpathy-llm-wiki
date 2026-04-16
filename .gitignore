@@ -2,3 +2,7 @@
 *.swp
 *.swo
 *~
+
+# Agent's dogfood wiki — private to this repo, do not ship via `npx add-skill`
+raw/
+wiki/
