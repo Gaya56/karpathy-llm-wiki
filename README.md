@@ -8,10 +8,6 @@
 [![Agent Skills](https://img.shields.io/badge/Agent_Skills-compatible-blue)](https://agentskills.io)
 [![Install](https://img.shields.io/badge/Install-npx_add--skill-green)](https://github.com/Astro-Han/karpathy-llm-wiki#install)
 
-<p align="center">
-  <img src="assets/karpathy-tweet.png" alt="Karpathy's tweet about LLM Wiki" width="560">
-</p>
-
 `karpathy-llm-wiki` packages [Karpathy's LLM Wiki idea](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) into one installable [Agent Skills](https://agentskills.io) skill. Your coding agent ingests sources into `raw/`, compiles durable knowledge pages into `wiki/`, answers questions with citations, and lints the wiki for consistency.
 
 ## What Is an LLM Wiki?
@@ -37,15 +33,9 @@ See [SKILL.md](SKILL.md) for the full skill specification.
 
 This skill is optimized for the wiki model: knowledge that improves over time instead of re-deriving relationships on every query.
 
-## Usage Stats
+## Example output
 
-Based on a production knowledge base maintained daily since April 2026:
-
-- **94** wiki articles across **13** topic directories
-- **99** source materials ingested
-- **87** operation log entries in the last 7 days
-
-See [examples/](examples/) for sample wiki pages, source files, and operation logs.
+See [examples/](examples/) for sample wiki pages, a raw source file, a compiled article showing cascade-updated cross-references, and operation log entries — all pulled from a real production wiki maintained with this skill.
 
 ## Install
 
@@ -120,7 +110,7 @@ Web pages, papers, blog posts, PDFs, markdown files, text files, and pasted text
 
 ### Is this production-ready?
 
-The workflow is based on a real knowledge base with 94 articles and 99 sources maintained daily since April 2026. The repo includes examples, templates, and a design spec.
+The workflow is based on a real knowledge base maintained since April 2026. The repo ships the skill specification (`SKILL.md`), five reference templates (raw, article, index, topic-index, archive), and runnable examples you can reference when setting up your own wiki.
 
 ## Inspired By
 
