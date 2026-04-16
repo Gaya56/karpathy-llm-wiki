@@ -6,3 +6,9 @@
 # Agent's dogfood wiki — private to this repo, do not ship via `npx add-skill`
 raw/
 wiki/
+
+# wiki-ingester hook notification log
+.claude/logs/
+
+# Stray binary sources dropped at repo root — should go into raw/ per SKILL.md
+*.pdf

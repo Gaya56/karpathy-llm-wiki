@@ -19,7 +19,10 @@
       "Bash(cat:*)",
       "Bash(wc:*)",
       "Bash(find:*)",
-      "Bash(npx add-skill:*)"
+      "Bash(npx add-skill:*)",
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(python3:*)"
     ],
     "ask": [
       "Bash(git push:*)",
