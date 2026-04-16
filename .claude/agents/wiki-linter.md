@@ -3,6 +3,11 @@ name: wiki-linter
 description: Use when asked to lint a wiki, validate example output, or dry-run the Lint operation. Executes the deterministic checks from SKILL.md against a given wiki/ directory and reports heuristic findings without auto-fixing.
 tools: Read, Grep, Glob, Edit
 model: sonnet
+hooks:
+  Stop:
+    - hooks:
+        - type: command
+          command: "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/wiki-linter-done.sh"
 ---
 
 You run the Lint operation defined in `SKILL.md` against a target `wiki/` directory (in this repo, usually `examples/` or a user-supplied path).
