@@ -1,7 +1,6 @@
 # {Title}
 
 > Sources: [{Cited Article 1}](article1.md); [{Cited Article 2}](../other-topic/article2.md)
-{Paths must be relative to this file: same-topic = filename only, cross-topic = ../other-topic/filename.md}
 > Archived: {YYYY-MM-DD}
 
 ## Overview
