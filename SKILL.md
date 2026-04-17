@@ -58,6 +58,8 @@ Fetch a source into raw/, then compile it into wiki/. Always both steps, no exce
 
    See `references/raw-template.md` for the exact format.
 
+**Binary or tabular sources (CSV, JSON, Parquet, images, etc.).** The raw artifact is the source file itself — copy it verbatim into `raw/<topic>/YYYY-MM-DD-descriptive-slug.<ext>` with no modification. Alongside it, create a markdown sidecar at `raw/<topic>/YYYY-MM-DD-descriptive-slug.md` carrying the same metadata header (Source URL, Collected, Published) plus a Schema section for tabular sources. The compiled wiki article references both — sidecar for context, raw file for the full data. When the source is too large to inline, sample a representative preview in the wiki article and point at the raw file for the complete content.
+
 ### Compile (wiki/)
 
 Determine where the new content belongs:

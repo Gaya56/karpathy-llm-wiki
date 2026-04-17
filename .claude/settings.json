@@ -23,6 +23,9 @@
       "Bash(mkdir:*)",
       "Bash(touch:*)",
       "Bash(python3:*)",
+      "Bash(curl:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
       "WebFetch"
     ],
     "ask": [
@@ -38,7 +41,6 @@
       "Bash(git push -f:*)",
       "Bash(git reset --hard:*)",
       "Bash(rm -rf:*)",
-      "Bash(curl:*)",
       "Bash(npm publish:*)"
     ],
     "defaultMode": "default"
