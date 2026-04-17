@@ -43,3 +43,8 @@
 ## [2026-04-17] lint | 2 issues found, 2 auto-fixed
 
 ## [2026-04-17] ingest | GitHub Copilot Plugins Directory (Awesome Copilot)
+
+## [2026-04-17] ingest | MCP in Claude Code
+- Updated: Extending Claude Code
+- Updated: Custom Subagents
+- Updated: Claude Code Overview

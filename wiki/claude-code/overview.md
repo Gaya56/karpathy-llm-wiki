@@ -2,6 +2,7 @@
 
 > Sources: Anthropic, 2026-04-16; Anthropic, 2026-04-17
 > Raw: [claude-code-overview](../../raw/claude-code/claude-code-overview.md)
+> Updated: 2026-04-17
 
 ## Overview
 
@@ -69,4 +70,5 @@ MCP — the Model Context Protocol — is the open-standard mechanism for connec
 ## See Also
 
 - [Extending Claude Code](extensions.md) — mechanisms (CLAUDE.md, Skills, Subagents, Agent Teams, MCP, Hooks, Plugins) explained in depth, with comparisons and context-cost trade-offs
+- [MCP in Claude Code](mcp.md) — full MCP reference: installing servers, scopes, OAuth, Tool Search, output limits, resources, prompts, and managed organization configuration
 - [Claude Prompting Best Practices](claude-prompting-best-practices.md) — model-specific behavioral tuning, general prompting principles, output control, tool use, thinking/reasoning, and agentic system patterns
