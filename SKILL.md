@@ -17,9 +17,10 @@ Three layers, all under the user's project root:
 
 **raw/** — Immutable source material. You read, never modify. Organized by topic subdirectories (e.g., `raw/machine-learning/`).
 
-**wiki/** — Compiled knowledge articles. You have full ownership. Organized by topic subdirectories, one level only: `wiki/<topic>/<article>.md`. Contains two special files:
-- `wiki/index.md` — Global index. One row per article, grouped by topic, with link + summary + Updated date.
-- `wiki/log.md` — Append-only operation log.
+**wiki/** — Compiled knowledge articles. You have full ownership. Organized by topic subdirectories, one level only: `wiki/<topic>/<article>.md`. Contains:
+- `wiki/index.md` — Top-level topic directory. One row per topic, with a link into that topic's own index, a short description, and an optional Updated date. No article rows at this level.
+- `wiki/<topic>/index.md` — Per-topic index. One row per article in that topic, with link + summary + Updated date.
+- `wiki/log.md` — Append-only operation log (single file at wiki root, covers all topics chronologically).
 
 **SKILL.md** (this file) — Schema layer. Defines structure and workflow rules.
 
@@ -57,6 +58,8 @@ Fetch a source into raw/, then compile it into wiki/. Always both steps, no exce
 
    See `references/raw-template.md` for the exact format.
 
+**Binary or tabular sources (CSV, JSON, Parquet, images, etc.).** The raw artifact is the source file itself — copy it verbatim into `raw/<topic>/YYYY-MM-DD-descriptive-slug.<ext>` with no modification. Alongside it, create a markdown sidecar at `raw/<topic>/YYYY-MM-DD-descriptive-slug.md` carrying the same metadata header (Source URL, Collected, Published) plus a Schema section for tabular sources. The compiled wiki article references both — sidecar for context, raw file for the full data. When the source is too large to inline, sample a representative preview in the wiki article and point at the raw file for the complete content.
+
 ### Compile (wiki/)
 
 Determine where the new content belongs:
@@ -77,14 +80,15 @@ See `references/article-template.md` for article format. Key points:
 After the primary article, check for ripple effects:
 
 1. Scan articles in the same topic directory for content affected by the new source.
-2. Scan `wiki/index.md` entries in other topics for articles covering related concepts.
-3. Update every article whose content is materially affected. Each updated file gets its Updated date refreshed.
+2. Update every article in that same topic whose content is materially affected. Each updated file gets its Updated date refreshed.
+
+Cascade Updates are same-topic only. Cross-topic See Also additions are out of scope for Ingest — the wiki-linter surfaces missing cross-topic references as heuristic findings, and those are applied as a separate editorial step if desired.
 
 Archive pages are never cascade-updated (they are point-in-time snapshots).
 
 ### Post-Ingest
 
-Update `wiki/index.md`: add or update entries for every touched article. When adding a new topic section, include a one-line description. The Updated date reflects when the article's knowledge content last changed, not the file system timestamp. See `references/index-template.md` for format.
+Update `wiki/<topic>/index.md`: add or update entries for every touched article in that topic. When the ingest introduces a genuinely new topic (no existing `wiki/<topic>/` directory before this ingest), also create `wiki/<topic>/index.md` with the topic description, and add one row for the new topic in the top-level `wiki/index.md`. Never add article rows to the top-level index. The Updated date reflects when the article's knowledge content last changed, not the file system timestamp. See `references/topic-index-template.md` for the per-topic format and `references/index-template.md` for the top-level format.
 
 Append to `wiki/log.md`:
 
@@ -184,4 +188,4 @@ Append to `wiki/log.md`:
 - wiki/ supports one level of topic subdirectories only. No deeper nesting.
 - Today's date for log entries, Collected dates, and Archived dates. Updated dates reflect when the article's knowledge content last changed. Published dates come from the source (use `Unknown` when unavailable).
 - Inside wiki/ files, all markdown links use paths relative to the current file. In conversation output, use project-root-relative paths (e.g., `wiki/topic/article.md`).
-- Ingest updates both `wiki/index.md` and `wiki/log.md`. Archive (from Query) updates both. Lint updates `wiki/log.md` (and `wiki/index.md` only when auto-fixing index entries). Plain queries do not write any files.
+- Ingest updates `wiki/<topic>/index.md` and `wiki/log.md` on every run, and also writes a new row in `wiki/index.md` when (and only when) the ingest creates a new topic. Archive (from Query) updates the topic's `index.md` and the log. Lint updates `wiki/log.md` (and any relevant index only when auto-fixing index entries). Plain queries do not write any files.

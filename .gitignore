@@ -2,3 +2,18 @@
 *.swp
 *.swo
 *~
+
+# Agent's dogfood wiki — normally private to this repo, but un-ignored on this
+# branch so the dogfood data is visible/committable for review. Re-ignore before
+# merging to main so `npx add-skill` installs don't inherit the knowledge base.
+# raw/
+# wiki/
+
+# wiki-ingester hook notification log
+.claude/logs/
+
+# Stray binary sources dropped at repo root — should go into raw/ per SKILL.md
+*.pdf
+
+#vscode settings
+.vscode/

@@ -1,0 +1,29 @@
+{
+    "servers": {
+        "context7": {
+            "url": "https://mcp.context7.com/mcp",
+            "type": "http",
+            "env": {
+                "CONTEXT7_API_KEY": "ctx7sk-325949af-b2fd-4089-a393-c50c1f75f3f4"
+            }
+        },
+        "filesystem": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "/workspaces/karpathy-llm-wiki"
+            ],
+            "type": "stdio"
+        },
+        "sequential-thinking": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-sequential-thinking"
+            ],
+            "type": "stdio"
+        }
+    },
+    "inputs": []
+}
