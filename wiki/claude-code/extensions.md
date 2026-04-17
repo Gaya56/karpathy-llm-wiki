@@ -2,6 +2,7 @@
 
 > Sources: Anthropic, 2026-04-16
 > Raw: [extend-claude-code](../../raw/claude-code/extend-claude-code.md)
+> Updated: 2026-04-17
 
 ## Overview
 
@@ -89,6 +90,7 @@ Two notes worth internalizing:
 ## See Also
 
 - [Claude Code Overview](overview.md) — the surfaces and product-level capabilities behind these extension mechanisms
+- [MCP in Claude Code](mcp.md) — full MCP reference: transports, scopes, OAuth, Tool Search, output limits, resources, prompts, elicitation, and managed configuration
 - [Custom Subagents](subagents.md) — full configuration reference for building subagents (frontmatter fields, storage scopes, foreground vs. background, lifecycle hooks)
 - [Hooks Reference](hooks.md) — full event vocabulary (26 events), configuration schema, matcher rules, exit-code and JSON output, async and asyncRewake modes
 - [Claude Prompting Best Practices](claude-prompting-best-practices.md) — model-specific behavioral tuning, output control, tool use, thinking/reasoning, and agentic patterns that apply across the extension surface
