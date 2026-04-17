@@ -26,6 +26,13 @@
       "Bash(curl:*)",
       "Bash(cp:*)",
       "Bash(mv:*)",
+      "Bash(qmd update:*)",
+      "Bash(qmd embed:*)",
+      "Bash(qmd query:*)",
+      "Bash(qmd search:*)",
+      "Bash(qmd vsearch:*)",
+      "Bash(qmd status:*)",
+      "Bash(qmd collection list:*)",
       "WebFetch"
     ],
     "ask": [
@@ -44,5 +51,6 @@
       "Bash(npm publish:*)"
     ],
     "defaultMode": "default"
-  }
+  },
+  "enabledMcpjsonServers": ["qmd"]
 }
