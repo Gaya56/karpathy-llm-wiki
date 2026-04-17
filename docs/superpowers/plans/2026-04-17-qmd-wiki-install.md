@@ -4,7 +4,7 @@
 
 **Goal:** Install qmd as a fully local hybrid-search layer over the existing wiki, wired to Claude Code via a project-scoped MCP server, with post-ingest refresh in the wiki-ingester hook.
 
-**Architecture:** qmd runs outside the wiki write path. Two named collections (`wiki`, `raw`) point at this repo's `wiki/` and `raw/` directories; qmd's index and models live in `~/.cache/qmd/` (per-user, outside the repo). MCP uses stdio (`qmd mcp`) registered in `.claude/settings.json`. Refresh (`qmd update && qmd embed`) fires from the existing `wiki-ingester-done.sh` Stop hook after each ingest; failures are logged but not raised. No wiki write-path code changes.
+**Architecture:** qmd runs outside the wiki write path. Two named collections (`wiki`, `raw`) point at this repo's `wiki/` and `raw/` directories; qmd's index and models live in `~/.cache/qmd/` (per-user, outside the repo). MCP uses stdio (`qmd mcp`) registered in `.mcp.json` at the repo root (Claude Code's canonical project-scoped MCP file), pre-approved via `enabledMcpjsonServers: ["qmd"]` in `.claude/settings.json`. Refresh (`qmd update && qmd embed`) fires from the existing `wiki-ingester-done.sh` Stop hook after each ingest; failures are logged but not raised. No wiki write-path code changes.
 
 **Tech Stack:** qmd (npm package `@tobilu/qmd`), node-llama-cpp, SQLite FTS5, EmbeddingGemma 300M, Qwen3 0.6B reranker, Qwen3 1.7B query-expansion. Requires Node.js ≥22 or Bun ≥1.0.0.
 
@@ -137,31 +137,26 @@ git commit -m "feat(qmd): add fresh-install bootstrap script for wiki + raw coll
 
 **Files:**
 
-- Modify: `.claude/settings.json` — add `mcpServers.qmd` block and seven Bash permission patterns
+- Create: `.mcp.json` at repo root — canonical Claude Code project-scoped MCP config
+- Modify: `.claude/settings.json` — add `enabledMcpjsonServers` entry and seven Bash permission patterns
+
+**Design note on file choice:** Claude Code's `.claude/settings.json` schema does not accept a top-level `mcpServers` key — that shape is only valid at user-level `~/.claude/settings.json`. For project-scoped MCP committed with the repo, the canonical file is `.mcp.json` at the repo root. `enabledMcpjsonServers` in `.claude/settings.json` marks the project MCP server as pre-approved so Claude Code doesn't prompt for permission on each fresh session.
 
 - [ ] **Step 1: Read current settings.json to confirm structure**
 
 ```bash
 cat /workspaces/karpathy-llm-wiki/.claude/settings.json
+ls /workspaces/karpathy-llm-wiki/.mcp.json 2>/dev/null || echo "(no .mcp.json yet — will create)"
 ```
 
-Confirm top-level keys are `$schema`, `env`, `permissions`. We will add a new top-level `mcpServers` key adjacent to those.
+Confirm `.claude/settings.json` top-level keys are `$schema`, `env`, `permissions`. Confirm no `.mcp.json` exists yet.
 
-- [ ] **Step 2: Add the `mcpServers.qmd` block**
+- [ ] **Step 2: Create `.mcp.json` at repo root**
 
-Use Edit. Replace this (the closing of `permissions`):
-
-```json
-    "defaultMode": "default"
-  }
-}
-```
-
-With:
+Use Write to create `/workspaces/karpathy-llm-wiki/.mcp.json` with this exact content:
 
 ```json
-    "defaultMode": "default"
-  },
+{
   "mcpServers": {
     "qmd": {
       "command": "qmd",
@@ -171,15 +166,17 @@ With:
 }
 ```
 
-- [ ] **Step 3: Add seven Bash permission patterns to `permissions.allow`**
+- [ ] **Step 3: Add `enabledMcpjsonServers` and seven Bash permission patterns to `.claude/settings.json`**
 
-Use Edit. Replace this line:
+Use Edit on `.claude/settings.json`.
+
+**old_string:**
 
 ```json
       "Bash(mv:*)",
 ```
 
-With:
+**new_string:**
 
 ```json
       "Bash(mv:*)",
@@ -192,21 +189,41 @@ With:
       "Bash(qmd collection list:*)",
 ```
 
-- [ ] **Step 4: Validate JSON**
+Then a second Edit to add `enabledMcpjsonServers` adjacent to the permissions block.
 
-```bash
-python3 -m json.tool /workspaces/karpathy-llm-wiki/.claude/settings.json > /dev/null && echo "valid JSON"
+**old_string:**
+
+```json
+    "defaultMode": "default"
+  }
+}
 ```
 
-Expected: `valid JSON`
+**new_string:**
 
-Also re-read the file and visually confirm the `mcpServers` and new `Bash(qmd ...)` entries are present.
+```json
+    "defaultMode": "default"
+  },
+  "enabledMcpjsonServers": ["qmd"]
+}
+```
+
+- [ ] **Step 4: Validate both JSONs**
+
+```bash
+python3 -m json.tool /workspaces/karpathy-llm-wiki/.mcp.json > /dev/null && echo ".mcp.json valid"
+python3 -m json.tool /workspaces/karpathy-llm-wiki/.claude/settings.json > /dev/null && echo "settings.json valid"
+```
+
+Expected: both print `valid`.
+
+Also re-read both files and visually confirm: `.mcp.json` has only the `mcpServers.qmd` block, and `.claude/settings.json` has the seven new `Bash(qmd ...)` entries plus the new `enabledMcpjsonServers: ["qmd"]` at the top level.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add .claude/settings.json
-git commit -m "feat(qmd): register qmd MCP server and allow qmd bash commands"
+git add .mcp.json .claude/settings.json
+git commit -m "feat(qmd): register qmd MCP server (.mcp.json) and allow qmd bash commands"
 ```
 
 ---
@@ -341,7 +358,7 @@ Fresh-install only. If `wiki` or `raw` collections already exist in qmd, the scr
 
 ## Wiring
 
-MCP server `qmd` is registered in `.claude/settings.json` via stdio transport (`qmd mcp`). Exposed MCP tools: `query`, `get`, `multi_get`, `status`. No plugin install. No HTTP daemon.
+MCP server `qmd` is registered in `.mcp.json` at the repo root (Claude Code's project-scoped MCP config file) and pre-approved via `enabledMcpjsonServers: ["qmd"]` in `.claude/settings.json`. Transport is stdio (`qmd mcp` default). Exposed MCP tools: `query`, `get`, `multi_get`, `status`. No plugin install. No HTTP daemon.
 
 ## Refresh
 
@@ -419,7 +436,7 @@ Expected: results include `wiki/llm-wiki/llm-wiki-pattern.md`. Exact rank positi
 
 - [ ] **Step 4: MCP sanity check from Claude Code**
 
-Restart Claude Code so it picks up the new `mcpServers.qmd` entry. From a fresh session, invoke the qmd MCP `status` tool directly. Expected: the tool responds with qmd status info — proving the MCP entry is valid and the stdio server starts correctly.
+Restart Claude Code so it picks up the new `.mcp.json` entry. From a fresh session, invoke the qmd MCP `status` tool directly. Expected: the tool responds with qmd status info — proving the `.mcp.json` entry is valid, the server is pre-approved via `enabledMcpjsonServers`, and the stdio server starts correctly.
 
 - [ ] **Step 5: Hook smoke test — live ingest**
 
