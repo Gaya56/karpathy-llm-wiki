@@ -91,3 +91,4 @@ Two notes worth internalizing:
 - [Claude Code Overview](overview.md) — the surfaces and product-level capabilities behind these extension mechanisms
 - [Custom Subagents](subagents.md) — full configuration reference for building subagents (frontmatter fields, storage scopes, foreground vs. background, lifecycle hooks)
 - [Hooks Reference](hooks.md) — full event vocabulary (26 events), configuration schema, matcher rules, exit-code and JSON output, async and asyncRewake modes
+- [Claude Prompting Best Practices](claude-prompting-best-practices.md) — model-specific behavioral tuning, output control, tool use, thinking/reasoning, and agentic patterns that apply across the extension surface

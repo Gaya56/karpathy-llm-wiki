@@ -35,3 +35,11 @@
 - Updated: LLM Wiki Pattern
 
 ## [2026-04-17] lint | 0 issues found, 0 auto-fixed
+
+## [2026-04-17] ingest | Claude Prompting Best Practices
+- Updated: Claude Code Overview
+- Updated: Custom Subagents
+
+## [2026-04-17] lint | 2 issues found, 2 auto-fixed
+
+## [2026-04-17] ingest | GitHub Copilot Plugins Directory (Awesome Copilot)

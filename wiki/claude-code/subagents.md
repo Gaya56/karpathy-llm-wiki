@@ -1,6 +1,6 @@
 # Custom Subagents
 
-> Sources: Anthropic, 2026-04-16
+> Sources: Anthropic, 2026-04-16; Anthropic, 2026-04-17
 > Raw: [create-custom-subagents](../../raw/claude-code/create-custom-subagents.md)
 
 ## Overview
@@ -100,3 +100,4 @@ Claude Code ships four built-ins: **Explore** (fast read-only, Haiku), **Plan** 
 - [Hooks Reference](hooks.md) — complete event vocabulary for subagent-lifecycle hooks (`SubagentStart`, `SubagentStop`, frontmatter `PreToolUse` / `PostToolUse` / `Stop`), plus async and asyncRewake modes for background subagents
 - [Extending Claude Code](extensions.md) — where subagents sit alongside CLAUDE.md, Skills, MCP, Hooks, Agent Teams, and Plugins in the extension surface
 - [Claude Code Overview](overview.md) — product-level context
+- [Claude Prompting Best Practices](claude-prompting-best-practices.md) — prompting guidance for controlling subagent spawning behavior (Opus 4.7 spawns fewer by default; Opus 4.6 over-spawns) and orchestration patterns
