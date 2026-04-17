@@ -1,39 +1,52 @@
-### QMD and Wiki Integration Brainstorming Session
+# qmd ↔ wiki integration — as installed
 
-***
+This repo has qmd wired in as an optional local-search layer over the compiled wiki. The wiki itself is unchanged; qmd only reads.
 
-**Prompt for Claude Code**
+## Scope
 
-I want to have an ongoing brainstorming conversation about whether and how we can integrate **QMD** with our existing **karpathy‑llm‑wiki setup** inside the current Codespace. At the moment, the **wiki is already fully integrated and working**, and the priority is to **not break, refactor, or destabilize** anything that exists today.
+qmd indexes two collections from this repo:
 
-Your first step is to assess feasibility by **measuring and grounding every response** in what already exists. You must actively reference and reason from:
+- `wiki` — compiled articles under `wiki/<topic>/`
+- `raw` — immutable source captures under `raw/<topic>/`
 
-*   `/workspaces/karpathy-llm-wiki/wiki/llm-wiki`
-*   <https://github.com/Astro-Han/karpathy-llm-wiki>
-*   <https://github.com/tobi/qmd/tree/main>
-*   Official documentation, talks, and reputable articles only
+qmd never writes to the repo. Its index and downloaded GGUF models live at `~/.cache/qmd/` per-user, outside the repo.
 
-The long‑term goal is to understand the **simplest, safest, and most scalable way** for **QMD and the Wiki to coexist** in the same system **for different purposes**. This is **not just for coding**—the system must remain flexible enough to support future use cases like business, research, and knowledge work. We want **clear separation of responsibilities**, not tool overlap or forced coupling.
+## Install
 
-**Rules you must follow**
+```bash
+bash scripts/qmd-bootstrap.sh
+```
 
-*   Always cite sources; prefer official repos and docs.
-*   Push back when ideas conflict with best practices or real‑world usage.
-*   Do **not** agree just to be agreeable.
-*   Never guess, fill in gaps, or hallucinate.
-*   Clearly state assumptions, or stop if required information is missing.
-*   Call out non‑goals (e.g., no rewrites, no schema changes).
-*   Label conclusions clearly: ✅ Safe now / ⚠️ Possible later / ❌ Not recommended (with why).
+Fresh-install only. If `wiki` or `raw` collections already exist in qmd, the script refuses to run. First embed downloads ~2 GB of models and may take several minutes.
 
-**Response format**
+## Wiring
 
-*   Plain English, as if explaining to a beginner.
-*   Always **under 100 words**.
-*   One or two short paragraphs for reasoning.
-*   **One small table only** for references/citations.
+MCP server `qmd` is registered in `.mcp.json` at the repo root (Claude Code's project-scoped MCP config file) and pre-approved via `enabledMcpjsonServers: ["qmd"]` in `.claude/settings.json`. Transport is stdio (`qmd mcp` default). Exposed MCP tools: `query`, `get`, `multi_get`, `status`. No plugin install. No HTTP daemon.
 
-We’ll move step by step in a back‑and‑forth discussion as I think out loud and refine understanding.
+## Refresh
 
-***
+After each wiki-ingester run, `.claude/hooks/wiki-ingester-done.sh` runs `qmd update` then `qmd embed`. Both run inside `if` branches so a failure does not trip `set -e`; outcomes are logged to `.claude/logs/wiki-ingester.log`. If qmd ever goes stale, run manually:
 
-This prompt is designed to guide a focused, evidence‑based conversation about integrating QMD with the existing wiki setup, while ensuring we maintain stability and scalability. It emphasizes critical thinking, source grounding, and clear communication.
+```bash
+qmd update && qmd embed
+```
+
+## Query policy
+
+Answers come from compiled articles under `wiki/`. The `raw` collection is searchable so topic gaps are discoverable, but the agent should not synthesize answers from raw chunks. This is prompt-policy, not qmd-enforced — `qmd query` will happily return raw passages if they rank highly.
+
+## Proof query
+
+```bash
+qmd query "llm wiki pattern"
+```
+
+Should return `wiki/llm-wiki/llm-wiki-pattern.md` in the ranked results.
+
+## Links
+
+- Spec: `docs/superpowers/specs/2026-04-17-qmd-wiki-install-design.md`
+- Plan: `docs/superpowers/plans/2026-04-17-qmd-wiki-install.md`
+- qmd upstream: https://github.com/tobi/qmd
+- LLM Wiki pattern: `wiki/llm-wiki/llm-wiki-pattern.md`
+- qmd article: `wiki/llm-wiki/qmd.md`
