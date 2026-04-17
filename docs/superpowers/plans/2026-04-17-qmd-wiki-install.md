@@ -383,7 +383,7 @@ git commit -m "docs(qmd): rewrite integration prompt as as-built documentation"
 
 ## Task 5: End-to-end verification
 
-No file changes in this task until the final log entry. This is a verification pass the operator runs after Tasks 1–4 are merged.
+No file changes in this task. This is a verification pass the operator runs after Tasks 1–4 are merged.
 
 - [ ] **Step 1: Run the bootstrap**
 
@@ -437,23 +437,13 @@ qmd get wiki/<topic>/<newly-ingested-article>.md
 
 Expected: the new article is returned. This proves the hook ran the refresh on the live delta.
 
-- [ ] **Step 6: Record verification in the wiki log**
+Verification ends here — no write to `wiki/log.md`. Per `SKILL.md:23` and `SKILL.md:191`, that log is append-only for wiki operations (Ingest, Archive from Query, Lint). qmd is a layer on top of the wiki and is deliberately kept out of the log. The record of this install is:
 
-Append a single line to `wiki/log.md` documenting install verification. Example:
+- The four commits produced by Tasks 1–4 (dated and attributed).
+- Ongoing hook output captured in `.claude/logs/wiki-ingester.log` after each post-ingest refresh.
+- `.claude/prompts/qmd-wiki-integration.md` (rewritten in Task 4) describes the install as-built.
 
-```text
-## [2026-04-17] qmd install | 5/5 verification steps passed
-```
-
-- [ ] **Step 7: Commit the log entry (only the log)**
-
-```bash
-git status   # confirm wiki/log.md is the only unstaged change
-git add wiki/log.md
-git commit -m "chore(qmd): record install verification in wiki log"
-```
-
-Note: `wiki/log.md` is un-gitignored on the `modifications-1.1` branch, which is why this commit works. On `main`, `wiki/` is gitignored and this step would be skipped. If `git status` shows other unintended edits under `wiki/` (e.g., a test ingest from Step 5 that you don't want committed), deal with those before staging — the `git add` line stages only `wiki/log.md` by design.
+If a shared infra log covering qmd + wiki + other tooling is ever wanted, that's a SKILL.md schema change and warrants its own spec.
 
 ---
 
@@ -473,5 +463,6 @@ Note: `wiki/log.md` is un-gitignored on the `modifications-1.1` branch, which is
 - No user-level Claude Code settings changes (everything project-scoped).
 - No multilingual embedding model swap.
 - No `.gitignore` changes.
+- No writes to `wiki/log.md` — qmd is not a wiki operation per `SKILL.md:23` and `SKILL.md:191`.
 
 Each of these is a separate follow-up if needed.
