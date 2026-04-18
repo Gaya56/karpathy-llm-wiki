@@ -7,7 +7,13 @@
 #     qmd collection remove raw
 set -euo pipefail
 
-REPO=/workspaces/karpathy-llm-wiki
+# Resolve repo root from script location so the bootstrap works from any clone path.
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Ensure the wiki/ and raw/ directories exist. On a fresh clone of main they
+# won't; SKILL.md's Ingest operation would create them on first ingest, but qmd
+# collection add expects a real directory path at registration time.
+mkdir -p "$REPO/wiki" "$REPO/raw"
 
 # 1. Runtime preflight — Node.js >= 22 OR Bun >= 1.0
 have_node22=false
