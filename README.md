@@ -1,123 +1,79 @@
-# karpathy-llm-wiki
+# karpathy-llm-wiki (with qmd)
 
-**A reusable skill for building Karpathy-style LLM wikis with Claude Code, Cursor, Codex, and other Agent Skills tools.**
+A personal LLM wiki you can clone, install with one script, and start using with Claude Code in a few minutes. Built on two open-source projects stacked together: the wiki pattern skill for compiling knowledge into durable markdown, and qmd for searching that markdown locally with hybrid BM25 + vector + re-ranking — no cloud calls.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/Astro-Han/karpathy-llm-wiki?style=social)](https://github.com/Astro-Han/karpathy-llm-wiki)
-[![GitHub forks](https://img.shields.io/github/forks/Astro-Han/karpathy-llm-wiki?style=social)](https://github.com/Astro-Han/karpathy-llm-wiki)
-[![Agent Skills](https://img.shields.io/badge/Agent_Skills-compatible-blue)](https://agentskills.io)
-[![Install](https://img.shields.io/badge/Install-npx_add--skill-green)](https://github.com/Astro-Han/karpathy-llm-wiki#install)
+## Install (fresh clone)
 
-`karpathy-llm-wiki` packages [Karpathy's LLM Wiki idea](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) into one installable [Agent Skills](https://agentskills.io) skill. Your coding agent ingests sources into `raw/`, compiles durable knowledge pages into `wiki/`, answers questions with citations, and lints the wiki for consistency.
+Four steps. Works on Linux, macOS, and Windows under WSL.
 
-## What Is an LLM Wiki?
+1. **Clone this repo** and `cd` into it. The bootstrap script auto-detects its own location, so the clone path doesn't matter.
 
-An **LLM wiki** is a knowledge system where the LLM maintains structured wiki pages instead of re-searching raw documents on every question. New sources are compiled into durable markdown pages, cross-references are updated over time, and answers cite the wiki pages that already contain the synthesized knowledge.
+   ```bash
+   git clone https://github.com/Astro-Han/karpathy-llm-wiki.git
+   cd karpathy-llm-wiki
+   ```
 
-This skill gives you three operations:
+2. **Run the bootstrap.** This installs the qmd CLI globally, registers two collections (`wiki/` and `raw/`) pointing at this repo, attaches context metadata, and triggers the first embed — which downloads ~2.25 GB of GGUF models on first run. macOS users: run `brew install sqlite` first (qmd requires Homebrew SQLite).
 
-| Operation | What it does | Output |
-|-----------|--------------|--------|
-| **Ingest** | Collects a source into `raw/` and compiles it into the wiki | New or updated wiki pages |
-| **Query** | Searches the wiki and answers with citations | Grounded answers linking to markdown pages |
-| **Lint** | Checks index integrity, links, and wiki health | Auto-fixes plus reported issues |
+   ```bash
+   bash scripts/qmd-bootstrap.sh
+   ```
 
-See [SKILL.md](SKILL.md) for the full skill specification.
+3. **Open Claude Code** in this directory. On startup it reads `CLAUDE.md` (which points at the qmd + wiki workflow docs) and auto-loads the behavioral rule at `.claude/rules/qmd-wiki.md`. The qmd MCP server is pre-approved via `enabledMcpjsonServers` in `.claude/settings.json`.
 
-## LLM Wiki vs RAG
+4. **Ingest your first source.** Claude's wiki-ingester subagent handles the workflow — writes a raw capture, compiles a wiki article, updates the index, and the Stop hook automatically refreshes the qmd index.
 
-| Approach | Knowledge lives in | When synthesis happens | Good for |
-|----------|--------------------|------------------------|----------|
-| **RAG** | Raw chunks and embeddings | At query time | Broad retrieval across large corpora |
-| **LLM Wiki** | Curated markdown pages | During ingest and maintenance | Compounding knowledge, summaries, and durable cross-links |
+   > "Ingest https://example.com/some-docs into topic `my-topic`"
 
-This skill is optimized for the wiki model: knowledge that improves over time instead of re-deriving relationships on every query.
+After that, any knowledge question goes through `mcp__qmd__query` first — scoped to the wiki collection by default — and Claude answers from the compiled articles it finds.
 
-## Example output
+## Built on
 
-See [examples/](examples/) for sample wiki pages, a raw source file, a compiled article showing cascade-updated cross-references, and operation log entries — all pulled from a real production wiki maintained with this skill.
+Two upstream open-source projects. Both are actively maintained and stable.
 
-## Install
+| Upstream | What it provides |
+|---|---|
+| [Astro-Han/karpathy-llm-wiki](https://github.com/Astro-Han/karpathy-llm-wiki) | The wiki pattern skill itself — Ingest / Query / Lint operations, file-format templates, agent prompts. Canonical spec lives in `SKILL.md` with reference formats in `references/`. Based on [Karpathy's LLM Wiki idea](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). |
+| [tobi/qmd](https://github.com/tobi/qmd) | A fully local hybrid-search CLI, SDK, and MCP server for markdown knowledge bases. Stacks SQLite FTS5 (BM25) + vector embeddings (EmbeddingGemma 300M) + LLM re-ranking (Qwen3 0.6B), all on-device via node-llama-cpp. |
+
+The wiki pattern handles *how knowledge is authored and maintained*. qmd handles *how knowledge is found at query time*. They compose cleanly because qmd is read-only: it indexes the markdown the wiki produces without ever writing back.
+
+## Who it's for
+
+- **You, on a new machine.** Clone, run one script, everything works — no manual path edits, no per-machine configuration, no cloud dependencies.
+- **A dev evaluating the setup.** The file layout below shows what each piece does and where it lives, so the whole system is readable in under ten minutes.
+- **Anyone who wants their own LLM wiki.** Fork this, point the collections at your own paths, ingest your own sources. The two upstream projects do all the heavy lifting; this repo is an opinionated wiring.
+
+## How the two layers fit together
+
+| Layer | Files in this repo | Role |
+|---|---|---|
+| **Wiki pattern (upstream skill)** | `SKILL.md`, `references/*.md`, `.claude/agents/wiki-ingester.md`, `.claude/agents/wiki-linter.md`, `.claude/agents/skill-reviewer.md` | Defines the three operations (Ingest, Query, Lint), the file formats (raw, article, index, archive), and the subagents that run them. |
+| **qmd search layer (installed by us)** | `scripts/qmd-bootstrap.sh`, `.mcp.json`, `.claude/settings.json` (enabledMcpjsonServers + qmd Bash perms), `.claude/hooks/wiki-ingester-done.sh` (refresh hook), `.claude/rules/qmd-wiki.md` (auto-loaded agent behavior) | Indexes `wiki/` and `raw/` into `~/.cache/qmd/index.sqlite`, exposes `query`/`get`/`multi_get`/`status` via MCP, auto-refreshes after each ingest via the Stop hook. |
+| **Cross-cutting docs** | `docs/qmd-wiki-workflow.md` (human-facing workflow guide), `.claude/prompts/qmd-wiki-integration.md` (as-built install notes) | Explain how everything fits together for both humans and Claude. |
+
+Not in the repo: qmd's own state — the SQLite index and ~2.25 GB of downloaded models — all lives outside the repo at `~/.cache/qmd/`, per-user, never committed.
+
+## When to use `scripts/qmd-bootstrap.sh`
+
+- **First clone.** This is the primary use case.
+- **After a clean reset.** If you've run `rm -rf ~/.cache/qmd/` or `qmd collection remove wiki raw`, re-run the bootstrap.
+
+The script is fresh-install-only — it refuses to run if the `wiki` or `raw` collections are already registered (to avoid silently overwriting state). It does not need to be re-run for normal daily use; the `.claude/hooks/wiki-ingester-done.sh` Stop hook automatically runs `qmd update && qmd embed` after every ingest, so the index stays current without manual intervention.
+
+If you do need to manually refresh (e.g., after editing wiki files outside of an ingest):
 
 ```bash
-npx add-skill Astro-Han/karpathy-llm-wiki
+qmd update && qmd embed
 ```
 
-Works with any tool that supports the [Agent Skills](https://agentskills.io) standard.
+## Deeper reading
 
-## Quick Start
-
-### 1. Ingest your first source
-
-Give the skill a URL, a file, or pasted text:
-
-> "Ingest this article: https://example.com/attention-is-all-you-need"
-
-The skill stores the source in `raw/`, then compiles or updates the right knowledge pages in `wiki/`.
-
-### 2. Ask your wiki a question
-
-> "What do I know about attention mechanisms?"
-
-The skill searches the wiki and answers with citations linking back to your markdown pages.
-
-### 3. Keep the wiki healthy
-
-> "Lint my wiki"
-
-Checks for broken links, missing index entries, stale cross-references, and related issues.
-
-## How the Workflow Works
-
-The core idea from Karpathy: the LLM maintains the wiki while the human focuses on choosing sources and asking good questions.
-
-```text
-your-project/
-├── raw/            ← Immutable source material
-│   └── topic/
-│       └── 2026-04-03-source-article.md
-├── wiki/           ← Compiled knowledge pages maintained by the LLM
-│   ├── topic/
-│   │   ├── index.md        ← Topic's table of contents
-│   │   └── concept-name.md
-│   ├── index.md    ← Top-level topic directory
-│   └── log.md      ← Append-only operation log
-```
-
-Each new source can update multiple pages, strengthen cross-references, and record contradictions. That is what makes the wiki compound over time.
-
-## Tool Compatibility
-
-This skill follows the [agentskills.io](https://agentskills.io) open standard:
-
-| Tool | Install method |
-|------|----------------|
-| Claude Code | `npx add-skill Astro-Han/karpathy-llm-wiki` |
-| Cursor | `npx add-skill Astro-Han/karpathy-llm-wiki` |
-| Codex CLI | Copy to `.agents/skills/karpathy-llm-wiki/` |
-| OpenCode | `npx add-skill Astro-Han/karpathy-llm-wiki` |
-| Other tools | Copy `SKILL.md` and `references/` into the tool's skill directory |
-
-## FAQ
-
-### What is the difference between an LLM wiki and a personal wiki?
-
-An LLM wiki is maintained by the model. It updates summaries, cross-links, index entries, and contradictions as new material arrives. A normal personal wiki depends on manual editing.
-
-### What sources can I ingest?
-
-Web pages, papers, blog posts, PDFs, markdown files, text files, and pasted text. The skill converts everything into markdown under `raw/` and compiles it into `wiki/`.
-
-### Is this production-ready?
-
-The workflow is based on a real knowledge base maintained since April 2026. The repo ships the skill specification (`SKILL.md`), five reference templates (raw, article, index, topic-index, archive), and runnable examples you can reference when setting up your own wiki.
-
-## Inspired By
-
-Unofficial community implementation of the workflow from [Karpathy's LLM Wiki idea](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). The value here is the reusable workflow, prompt structure, and battle-tested knowledge-compilation rules.
-
-See also: [lucasastorian/llmwiki](https://github.com/lucasastorian/llmwiki), [atomicmemory/llm-wiki-compiler](https://github.com/atomicmemory/llm-wiki-compiler).
+- `docs/qmd-wiki-workflow.md` — full workflow guide: when to use Ingest vs. Query, how to shape queries, troubleshooting, scaling notes.
+- `.claude/rules/qmd-wiki.md` — pro-level behavioral rules for Claude when using qmd (concrete query JSON examples, filter guidance, scope escalation).
+- `SKILL.md` — canonical spec for the wiki pattern's three operations.
+- `wiki/llm-wiki/qmd.md` (once ingested) — deeper qmd architecture notes.
 
 ## License
 
-[MIT](LICENSE)
+MIT, inherited from the upstream skill.
