@@ -42,6 +42,14 @@ When you hit something `SKILL.md` doesn't provide — a missing operation, an aw
 
 The specific sources you will ingest, the checklist for validating the setup, and the roadmap of skills you want to package are not frozen in this file. They live in `wiki/index.md` once you scaffold the wiki, because that content changes as you learn.
 
+## qmd knowledge search
+
+This repo has a qmd MCP server indexing `wiki/` and `raw/`, installed per the plan at `docs/superpowers/plans/2026-04-17-qmd-wiki-install.md`. Detailed behavioral rules live in `.claude/rules/qmd-wiki.md`, which Claude Code auto-loads every session.
+
+**Default:** for knowledge questions about this repo's contents — tools, conventions, ingested docs, past decisions — prefer `mcp__qmd__query` before Read/Grep. Always include an `intent` parameter. Scope to `collections: ["wiki"]` when synthesizing answers.
+
+Human workflow guide: `docs/qmd-wiki-workflow.md`.
+
 ## Workflow
 
 For multi-step work — a new feature, a meaningful refactor, a chunk of wiki integration — use the full superpowers flow: brainstorm → write a plan → execute. Don't skip straight to editing.
