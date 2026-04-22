@@ -64,3 +64,14 @@
 ## [2026-04-19] ingest | Running Claude Code Autonomously
 
 ## [2026-04-19] lint | 9 issues found, 2 auto-fixed
+
+## [2026-04-19] ingest | Skills and Slash Commands
+- Updated: Extending Claude Code
+
+## [2026-04-22] ingest | tmux-cli
+
+## [2026-04-22] ingest | Agent Teams
+- Updated: Extending Claude Code
+- Updated: Custom Subagents
+
+## [2026-04-22] lint | 2 issues found, 2 auto-fixed

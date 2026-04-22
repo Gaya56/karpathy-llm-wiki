@@ -2,7 +2,7 @@
 
 > Sources: Anthropic, 2026-04-16
 > Raw: [extend-claude-code](../../raw/claude-code/extend-claude-code.md)
-> Updated: 2026-04-17
+> Updated: 2026-04-22
 
 ## Overview
 
@@ -20,7 +20,7 @@ The pattern this article captures: features aren't ranked by power but by where 
 
 **Subagents** are isolated workers with their own context window. They run within the current session but do their work separately and return a summary. Best for tasks that read many files, need parallel execution, or shouldn't bloat the main conversation's context. Subagents are opinionated: they receive the system prompt (shared with parent for cache efficiency), inherit CLAUDE.md and git status, get fully-preloaded content from any skills listed in their `skills:` field, and see whatever context the spawning agent passes in. They do *not* inherit conversation history or invoked skills from the main session — what they need must be declared explicitly.
 
-**Agent Teams** are architecturally one step up from subagents: multiple independent Claude Code sessions that communicate with each other directly rather than reporting back to a lead. Each teammate has its own context window and can be fully independent. Use when teammates need to share findings, challenge each other, or coordinate on separate pieces of a larger task. The transition signal is clear: if parallel subagents are hitting context limits or need to talk to each other, promote to a team. Currently experimental and disabled by default.
+**Agent Teams** are architecturally one step up from subagents: multiple independent Claude Code sessions that communicate with each other directly rather than reporting back to a lead. Each teammate has its own context window and can be fully independent. Use when teammates need to share findings, challenge each other, or coordinate on separate pieces of a larger task. The transition signal is clear: if parallel subagents are hitting context limits or need to talk to each other, promote to a team. Currently experimental and disabled by default (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` to enable). Three hook events apply specifically to teams: `TeammateIdle` (teammate about to go idle), `TaskCreated` (task being added to the shared list), and `TaskCompleted` (task being marked done) — all support exit code 2 to block and send feedback.
 
 **Hooks** run outside the agent loop entirely. They fire on lifecycle events — tool execution, session boundaries, prompt submission, permission requests, compaction — and execute as deterministic scripts with no LLM involvement. Zero context cost unless the hook explicitly returns output to the conversation. Ideal for side effects: linting after every edit, logging, notifications, running test suites. Hooks *merge* across sources rather than overriding, so every registered hook for an event fires regardless of which level (user, project, plugin) defined it.
 
@@ -90,7 +90,9 @@ Two notes worth internalizing:
 ## See Also
 
 - [Claude Code Overview](overview.md) — the surfaces and product-level capabilities behind these extension mechanisms
+- [Skills and Slash Commands](slash-commands.md) — full skills reference: frontmatter fields, invocation control, arguments, bash injection, subagent execution, scope/priority, and sharing
 - [MCP in Claude Code](mcp.md) — full MCP reference: transports, scopes, OAuth, Tool Search, output limits, resources, prompts, elicitation, and managed configuration
 - [Custom Subagents](subagents.md) — full configuration reference for building subagents (frontmatter fields, storage scopes, foreground vs. background, lifecycle hooks)
+- [Agent Teams](agent-teams.md) — full agent teams reference: architecture, display modes, task assignment, plan approval, hook events, subagent-definition reuse, best practices, and limitations
 - [Hooks Reference](hooks.md) — full event vocabulary (26 events), configuration schema, matcher rules, exit-code and JSON output, async and asyncRewake modes
 - [Claude Prompting Best Practices](claude-prompting-best-practices.md) — model-specific behavioral tuning, output control, tool use, thinking/reasoning, and agentic patterns that apply across the extension surface

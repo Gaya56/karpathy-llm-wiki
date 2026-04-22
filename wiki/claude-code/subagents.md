@@ -2,7 +2,7 @@
 
 > Sources: Anthropic, 2026-04-16; Anthropic, 2026-04-17
 > Raw: [create-custom-subagents](../../raw/claude-code/create-custom-subagents.md)
-> Updated: 2026-04-17
+> Updated: 2026-04-22
 
 ## Overview
 
@@ -99,6 +99,7 @@ Claude Code ships four built-ins: **Explore** (fast read-only, Haiku), **Plan** 
 ## See Also
 
 - [Hooks Reference](hooks.md) — complete event vocabulary for subagent-lifecycle hooks (`SubagentStart`, `SubagentStop`, frontmatter `PreToolUse` / `PostToolUse` / `Stop`), plus async and asyncRewake modes for background subagents
+- [Agent Teams](agent-teams.md) — full reference for multi-session coordination: when subagent definitions can be reused as teammates, display modes, task assignment, quality-gate hooks, and limitations
 - [Extending Claude Code](extensions.md) — where subagents sit alongside CLAUDE.md, Skills, MCP, Hooks, Agent Teams, and Plugins in the extension surface
 - [MCP in Claude Code](mcp.md) — `mcpServers` frontmatter field for inline subagent-scoped MCP connections (keeps tool descriptions out of main conversation context)
 - [Claude Code Overview](overview.md) — product-level context
